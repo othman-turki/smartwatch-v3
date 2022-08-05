@@ -12,17 +12,17 @@
 const char *ssid = "ETUDIANT_Plus";
 const char *password = "EnetcomEtud";
 
-IPAddress local_IP(192, 168, 1, 200); // 192.168.1.200/update
+IPAddress local_IP(192, 168, 1, 185); // 192.168.1.185/update
 IPAddress gateway(192, 168, 1, 1);
 IPAddress subnet(255, 255, 255, 0);
 IPAddress primaryDNS(8, 8, 8, 8);
 IPAddress secondaryDNS(8, 8, 4, 4);
+AsyncWebServer server(80);
 
 U8G2_SH1106_128X64_NONAME_1_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
 U8g2Graphing graph(&u8g2);
 
 MAX30105 particleSensor;
-AsyncWebServer server(80);
 
 // float result = 0;
 // float _ndx = 0;
@@ -34,6 +34,7 @@ long lastBeat = 0; // Time at which the last beat occurred
 
 float beatsPerMinute;
 int beatAvg;
+String statusBar = "";
 
 // void realtimeGraph();
 // float squareFourier(float degree, int harmonics);
@@ -50,7 +51,6 @@ void setup()
             { request->send(200, "text/plain", "Hi! I am ESP32."); });
 
   AsyncElegantOTA.begin(&server); // Start ElegantOTA
-  // WebSerial.begin(&server);
   server.begin();
 
   // Initialize sensor
@@ -141,8 +141,16 @@ void loop()
     Serial.print(" No finger?");
   Serial.println();
 
-  graph.inputValue(beatsPerMinute);
-  String statusBar = "BPM          AVG " + String(beatAvg);
+  if (irValue < 50000)
+  {
+    statusBar = "BPM          AVG 0";
+    graph.inputValue(0);
+  }
+  else
+  {
+    statusBar = "BPM          AVG " + String(beatAvg);
+    graph.inputValue(beatsPerMinute);
+  }
 
   u8g2.firstPage();
   do
