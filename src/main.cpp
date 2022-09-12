@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <U8g2lib.h>
 #include <Wire.h>
 #include <U8g2Graphing.h>
@@ -9,15 +10,15 @@
 #include "MAX30105.h"
 #include "heartRate.h"
 
-const char *ssid = "ETUDIANT_Plus";
-const char *password = "EnetcomEtud";
+// const char *ssid = "ETUDIANT_Plus";
+// const char *password = "EnetcomEtud";
 
-IPAddress local_IP(192, 168, 1, 185); // 192.168.1.185/update
-IPAddress gateway(192, 168, 1, 1);
-IPAddress subnet(255, 255, 255, 0);
-IPAddress primaryDNS(8, 8, 8, 8);
-IPAddress secondaryDNS(8, 8, 4, 4);
-AsyncWebServer server(80);
+// IPAddress local_IP(192, 168, 1, 251); // 192.168.1.251/update
+// IPAddress gateway(192, 168, 1, 1);
+// IPAddress subnet(255, 255, 255, 0);
+// IPAddress primaryDNS(8, 8, 8, 8);
+// IPAddress secondaryDNS(8, 8, 4, 4);
+// AsyncWebServer server(80);
 
 U8G2_SH1106_128X64_NONAME_1_HW_I2C u8g2(U8G2_R0, /* reset=*/U8X8_PIN_NONE);
 U8g2Graphing graph(&u8g2);
@@ -45,13 +46,18 @@ void setup()
   Serial.begin(115200);
   Serial.println("Initializing...");
 
-  initWiFi();
+  // if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS))
+  // {
+  //   Serial.println("STA Failed to configure");
+  // }
 
-  server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-            { request->send(200, "text/plain", "Hi! I am ESP32."); });
+  // initWiFi();
 
-  AsyncElegantOTA.begin(&server); // Start ElegantOTA
-  server.begin();
+  // server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
+  //           { request->send(200, "text/plain", "Hi! I am ESP32."); });
+
+  // AsyncElegantOTA.begin(&server); // Start ElegantOTA
+  // server.begin();
 
   // Initialize sensor
   if (!particleSensor.begin(Wire, I2C_SPEED_FAST)) // Use default I2C port, 400kHz speed
@@ -67,7 +73,6 @@ void setup()
   particleSensor.setPulseAmplitudeGreen(0);  // Turn off Green LED
 
   u8g2.begin();
-
   graph.clearData();
 
   u8g2.firstPage();
@@ -102,8 +107,6 @@ void setup()
   graph.displaySet(false, false);
   graph.pointerSet(true, (int)beatsPerMinute);
   graph.rangeSet(true, 0, 160);
-
-  delay(1000);
 }
 
 void loop()
@@ -164,22 +167,25 @@ void loop()
   } while (u8g2.nextPage());
 }
 
-void initWiFi()
-{
-  if (!WiFi.config(local_IP, gateway, subnet, primaryDNS, secondaryDNS))
-  {
-    Serial.println("STA Failed to configure");
-  }
+// void initWiFi()
+// {
+//   WiFi.mode(WIFI_STA);
+//   WiFi.begin(ssid, password);
+//   unsigned long timeout = millis();
 
-  WiFi.mode(WIFI_STA);
-  WiFi.begin(ssid, password);
-  Serial.print("Connecting");
-  while (WiFi.status() != WL_CONNECTED)
-  {
-    delay(500);
-    Serial.print(".");
-  }
-  Serial.println("");
-  Serial.print("Connected to WiFi network with IP Address: ");
-  Serial.println(WiFi.localIP());
-}
+//   Serial.print("Connecting");
+//   while (WiFi.status() != WL_CONNECTED)
+//   {
+//     delay(500);
+//     Serial.print(".");
+//     if (millis() - timeout > 10000)
+//       goto this_place;
+//   }
+//   Serial.println("");
+//   Serial.print("Connected to WiFi network with IP Address: ");
+//   Serial.println(WiFi.localIP());
+//   return;
+// this_place:
+//   Serial.print("Not connected");
+//   Serial.println("\n");
+// }
