@@ -37,9 +37,7 @@ float beatsPerMinute;
 int beatAvg;
 String statusBar = "";
 
-// void realtimeGraph();
-// float squareFourier(float degree, int harmonics);
-void initWiFi();
+// void initWiFi();
 
 void setup()
 {
